@@ -9,11 +9,13 @@ A beautiful, calm, and aesthetic Flutter productivity application for timing tea
 ## ✨ Features
 
 - 🎨 **Calm Aesthetic Design** - Soft color palette with sage green, warm beige, and lavender tones
+- 🌓 **Dark Mode Support** - Automatic system-based theme switching for day and night
 - ⏱️ **Dual Timer Options** - 3 minutes for Green Tea, 5 minutes for Black Tea
+- ▶️ **Auto-Start** - Timer begins immediately upon duration selection
 - 🔄 **Smooth Animations** - Circular timer visualization with gradient progress arc
-- 📱 **Cross-Platform** - Runs on iOS, Android, Web, macOS, Windows, and Linux
+- 📱 **Mobile-First Layout** - Optimized for one-handed use with centered visuals and bottom controls
 - ⚡ **Haptic Feedback** - Gentle vibrations when timer completes
-- 🎯 **Intuitive Controls** - Simple play, pause, and reset functionality
+- 🎯 **Intuitive Controls** - Combined pause/resume toggle and clear reset functionality
 - ✅ **Material 3 Design** - Modern UI with premium Google Fonts typography
 
 ## 📸 Screenshots
@@ -63,11 +65,10 @@ _Beautiful, minimalist interface showcasing the timer in action_
 
 ## 🎯 Usage
 
-1. **Select Duration**: Tap on either "3 Minutes" (Green Tea) or "5 Minutes" (Black Tea)
-2. **Start Timer**: Press the play button to begin countdown
-3. **Pause/Resume**: Use the pause button to pause, play to resume
-4. **Reset**: Press the refresh icon to reset the timer
-5. **Completion**: Receive haptic feedback and a celebration dialog when finished
+1. **Select Duration**: Tap on either "3 Minutes" (Green Tea) or "5 Minutes" (Black Tea) - Timer starts automatically!
+2. **Pause/Resume**: Use the toggle button to pause timer if needed, or resume countdown
+3. **Reset**: Press the reset button to return to the selection screen
+4. **Completion**: Receive haptic feedback and a celebration dialog when finished
 
 ## 🏗️ Architecture
 
@@ -118,8 +119,9 @@ flutter analyze
 - **Primary**: Soft Sage Green `#8B9D83`
 - **Secondary**: Warm Beige `#E8DCC4`
 - **Accent**: Soft Lavender `#C5B3D5`
-- **Background**: Off-White `#FAF8F5`
-- **Text**: Charcoal `#2C2C2C`
+- **Light Background**: Off-White `#FAF8F5`
+- **Dark Background**: Charcoal `#1A1A1A`
+- **Text**: Charcoal `#2C2C2C` (Light) / Off-White `#E0E0E0` (Dark)
 
 ### Typography
 
