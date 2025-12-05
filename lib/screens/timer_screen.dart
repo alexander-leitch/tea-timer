@@ -187,44 +187,33 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   
   /// Build control buttons based on timer status
   Widget _buildControlButtons(TimerState state, TimerController controller) {
-    if (state.status == TimerStatus.idle) {
-      // No controls when idle - user should select duration
-      return const SizedBox.shrink();
-    }
+    // Determine if buttons should be active
+    final bool hasTimer = state.selectedDuration > 0;
+    final bool isRunningOrPaused = state.status == TimerStatus.running || state.status == TimerStatus.paused;
     
     return Row(
       children: [
-        // Reset button
+        // Reset button (always visible, active when timer exists)
         Expanded(
           child: _ControlCard(
             icon: Icons.refresh,
             label: 'Reset',
-            onPressed: controller.reset,
-            isActive: true,
+            onPressed: hasTimer ? controller.reset : null,
+            isActive: hasTimer,
           ),
         ),
         
         const SizedBox(width: 16),
         
-        // Pause button (active when running, inactive otherwise)
+        // Pause/Resume toggle button (always visible, active when running or paused)
         Expanded(
           child: _ControlCard(
-            icon: Icons.pause,
-            label: 'Pause',
-            onPressed: state.status == TimerStatus.running ? controller.pause : null,
-            isActive: state.status == TimerStatus.running,
-          ),
-        ),
-        
-        const SizedBox(width: 16),
-        
-        // Resume button (active when paused, inactive otherwise)
-        Expanded(
-          child: _ControlCard(
-            icon: Icons.play_arrow,
-            label: 'Resume',
-            onPressed: state.status == TimerStatus.paused ? controller.resume : null,
-            isActive: state.status == TimerStatus.paused,
+            icon: state.status == TimerStatus.running ? Icons.pause : Icons.play_arrow,
+            label: state.status == TimerStatus.running ? 'Pause' : 'Resume',
+            onPressed: isRunningOrPaused 
+                ? (state.status == TimerStatus.running ? controller.pause : controller.resume)
+                : null,
+            isActive: isRunningOrPaused,
           ),
         ),
       ],

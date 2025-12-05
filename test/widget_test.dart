@@ -18,9 +18,13 @@ void main() {
     // Verify duration selector buttons are present
     expect(find.text('3 Minutes'), findsOneWidget);
     expect(find.text('5 Minutes'), findsOneWidget);
+    
+    // Verify control buttons are always visible (inactive when no timer)
+    expect(find.text('Reset'), findsOneWidget);
+    expect(find.text('Resume'), findsOneWidget);
   });
 
-  testWidgets('Duration buttons visible, control buttons always shown', (WidgetTester tester) async {
+  testWidgets('Control buttons toggle and remain visible', (WidgetTester tester) async {
     // Build our app with generous screen size
     await tester.binding.setSurfaceSize(const Size(800, 1200));
     await tester.pumpWidget(const ProviderScope(child: TeaTimerApp()));
@@ -32,14 +36,21 @@ void main() {
     // Verify the timer shows 03:00 initially
     expect(find.text('03:00'), findsOneWidget);
     
-    // All three control buttons should be visible (reset, pause, resume)
+    // Both control buttons should be visible
     expect(find.text('Reset'), findsOneWidget);
-    expect(find.text('Pause'), findsOneWidget);
-    expect(find.text('Resume'), findsOneWidget);
+    expect(find.text('Pause'), findsOneWidget); // Shows Pause when running
     
     // Duration selectors should STILL be visible
     expect(find.text('3 Minutes'), findsOneWidget);
     expect(find.text('5 Minutes'), findsOneWidget);
+    
+    // Pause the timer
+    await tester.tap(find.text('Pause'));
+    await tester.pumpAndSettle();
+    
+    // Button should toggle to Resume
+    expect(find.text('Resume'), findsOneWidget);
+    expect(find.text('Pause'), findsNothing);
     
     // Reset surface size
     await tester.binding.setSurfaceSize(null);
