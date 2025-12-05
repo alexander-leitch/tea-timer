@@ -20,7 +20,7 @@ void main() {
     expect(find.text('5 Minutes'), findsOneWidget);
   });
 
-  testWidgets('Duration selection auto-starts timer', (WidgetTester tester) async {
+  testWidgets('Duration selection auto-starts timer with card controls', (WidgetTester tester) async {
     // Build our app
     await tester.pumpWidget(const ProviderScope(child: TeaTimerApp()));
 
@@ -31,11 +31,21 @@ void main() {
     // Verify the timer shows 03:00 initially
     expect(find.text('03:00'), findsOneWidget);
     
-    // After auto-start, timer should be running, so pause button should appear
-    expect(find.byIcon(Icons.pause), findsOneWidget);
+    // After auto-start, timer should be running
+    // Card-style control buttons should appear with labels
+    expect(find.text('Pause'), findsOneWidget);
+    expect(find.text('Reset'), findsOneWidget);
     
     // Duration selectors should be hidden when timer is running
     expect(find.text('3 Minutes'), findsNothing);
     expect(find.text('5 Minutes'), findsNothing);
+    
+    // Pause the timer
+    await tester.tap(find.text('Pause'));
+    await tester.pumpAndSettle();
+    
+    // Resume button should appear
+    expect(find.text('Resume'), findsOneWidget);
+    expect(find.text('Pause'), findsNothing);
   });
 }

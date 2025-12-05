@@ -176,65 +176,44 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   
   /// Build control buttons based on timer status
   Widget _buildControlButtons(TimerState state, TimerController controller) {
-    if (state.selectedDuration == 0) {
-      // No duration selected
+    if (state.status == TimerStatus.idle) {
+      // No controls when idle - user should select duration
       return const SizedBox.shrink();
     }
     
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Reset button (always show when duration is selected)
-        if (state.status != TimerStatus.idle)
-          _CircularButton(
+        // Reset button
+        Expanded(
+          child: _ControlCard(
             icon: Icons.refresh,
+            label: 'Reset',
             onPressed: controller.reset,
-            backgroundColor: AppTheme.secondaryColor,
-            foregroundColor: AppTheme.textPrimary,
+          ),
+        ),
+        
+        const SizedBox(width: 16),
+        
+        // Pause/Resume button (no play button when idle since timer auto-starts)
+        if (state.status == TimerStatus.running)
+          Expanded(
+            child: _ControlCard(
+              icon: Icons.pause,
+              label: 'Pause',
+              onPressed: controller.pause,
+            ),
           ),
         
-        if (state.status != TimerStatus.idle) const SizedBox(width: 16),
-        
-        // Main action button (Start/Pause/Resume)
-        _CircularButton(
-          icon: _getMainButtonIcon(state.status),
-          onPressed: () => _handleMainButtonPress(state, controller),
-          backgroundColor: AppTheme.primaryColor,
-          foregroundColor: Colors.white,
-          size: 80,
-          iconSize: 36,
-        ),
+        if (state.status == TimerStatus.paused)
+          Expanded(
+            child: _ControlCard(
+              icon: Icons.play_arrow,
+              label: 'Resume',
+              onPressed: controller.resume,
+            ),
+          ),
       ],
     );
-  }
-  
-  /// Get the icon for the main action button
-  IconData _getMainButtonIcon(TimerStatus status) {
-    switch (status) {
-      case TimerStatus.idle:
-      case TimerStatus.completed:
-        return Icons.play_arrow;
-      case TimerStatus.running:
-        return Icons.pause;
-      case TimerStatus.paused:
-        return Icons.play_arrow;
-    }
-  }
-  
-  /// Handle main button press based on current status
-  void _handleMainButtonPress(TimerState state, TimerController controller) {
-    switch (state.status) {
-      case TimerStatus.idle:
-      case TimerStatus.completed:
-        controller.start();
-        break;
-      case TimerStatus.running:
-        controller.pause();
-        break;
-      case TimerStatus.paused:
-        controller.resume();
-        break;
-    }
   }
   
   /// Get status text for display
@@ -252,42 +231,96 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   }
 }
 
-/// Circular button widget for controls
-class _CircularButton extends StatelessWidget {
+/// Control card widget matching duration selector style
+class _ControlCard extends StatefulWidget {
   final IconData icon;
+  final String label;
   final VoidCallback onPressed;
-  final Color backgroundColor;
-  final Color foregroundColor;
-  final double size;
-  final double iconSize;
   
-  const _CircularButton({
+  const _ControlCard({
     required this.icon,
+    required this.label,
     required this.onPressed,
-    required this.backgroundColor,
-    required this.foregroundColor,
-    this.size = 64,
-    this.iconSize = 28,
   });
   
   @override
+  State<_ControlCard> createState() => _ControlCardState();
+}
+
+class _ControlCardState extends State<_ControlCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  
+  void _handleTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+  
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
+    widget.onPressed();
+  }
+  
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+  
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(size / 2),
-      elevation: 4,
-      shadowColor: backgroundColor.withOpacity(0.4),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(size / 2),
+    return GestureDetector(
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
         child: Container(
-          width: size,
-          height: size,
-          alignment: Alignment.center,
-          child: Icon(
-            icon,
-            color: foregroundColor,
-            size: iconSize,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                widget.icon,
+                color: AppTheme.primaryColor,
+                size: 32,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                widget.label,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppTheme.textPrimary,
+                    ),
+              ),
+            ],
           ),
         ),
       ),
