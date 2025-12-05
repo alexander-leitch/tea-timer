@@ -301,7 +301,7 @@ class _ControlCardState extends State<_ControlCard>
   @override
   Widget build(BuildContext context) {
     // Calculate effective opacity and color based on state
-    final double effectiveOpacity = widget.isActive ? 1.0 : 0.5;
+    final double effectiveOpacity = widget.isActive ? 1.0 : 0.3;
     // Use a darkened surface color for pressed state in light mode, or a lightened one in dark mode
     final Color baseColor = Theme.of(context).colorScheme.surface;
     final Color pressedColor = Theme.of(context).brightness == Brightness.light

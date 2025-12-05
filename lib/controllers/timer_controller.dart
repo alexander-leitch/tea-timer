@@ -106,12 +106,12 @@ class TimerController extends StateNotifier<TimerState> {
     start(); // Reuse the start logic
   }
   
-  /// Reset the timer to the selected duration
+  /// Reset the timer to initial state (clear selection)
   void reset() {
     _timer?.cancel();
     state = TimerState(
-      selectedDuration: state.selectedDuration,
-      remainingTime: state.selectedDuration,
+      selectedDuration: 0,
+      remainingTime: 0,
       status: TimerStatus.idle,
     );
   }
