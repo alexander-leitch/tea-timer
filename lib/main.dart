@@ -22,6 +22,8 @@ class TeaTimerApp extends StatelessWidget {
       title: 'Tea Timer',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system, // Automatically switch based on system settings
       home: const TimerScreen(),
     );
   }

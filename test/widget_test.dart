@@ -20,8 +20,9 @@ void main() {
     expect(find.text('5 Minutes'), findsOneWidget);
   });
 
-  testWidgets('Duration selection auto-starts timer with card controls', (WidgetTester tester) async {
-    // Build our app
+  testWidgets('Duration buttons visible, control buttons always shown', (WidgetTester tester) async {
+    // Build our app with generous screen size
+    await tester.binding.setSurfaceSize(const Size(800, 1200));
     await tester.pumpWidget(const ProviderScope(child: TeaTimerApp()));
 
     // Tap on the 3-minute duration
@@ -31,21 +32,16 @@ void main() {
     // Verify the timer shows 03:00 initially
     expect(find.text('03:00'), findsOneWidget);
     
-    // After auto-start, timer should be running
-    // Card-style control buttons should appear with labels
-    expect(find.text('Pause'), findsOneWidget);
+    // All three control buttons should be visible (reset, pause, resume)
     expect(find.text('Reset'), findsOneWidget);
-    
-    // Duration selectors should be hidden when timer is running
-    expect(find.text('3 Minutes'), findsNothing);
-    expect(find.text('5 Minutes'), findsNothing);
-    
-    // Pause the timer
-    await tester.tap(find.text('Pause'));
-    await tester.pumpAndSettle();
-    
-    // Resume button should appear
+    expect(find.text('Pause'), findsOneWidget);
     expect(find.text('Resume'), findsOneWidget);
-    expect(find.text('Pause'), findsNothing);
+    
+    // Duration selectors should STILL be visible
+    expect(find.text('3 Minutes'), findsOneWidget);
+    expect(find.text('5 Minutes'), findsOneWidget);
+    
+    // Reset surface size
+    await tester.binding.setSurfaceSize(null);
   });
 }

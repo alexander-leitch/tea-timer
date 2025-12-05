@@ -76,99 +76,110 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                // Header
-                const SizedBox(height: 16),
-                Text(
-                  'Tea Timer',
-                  style: Theme.of(context).textTheme.headlineLarge,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Steep your tea to perfection',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Duration selector (only show when idle)
-                if (timerState.status == TimerStatus.idle)
-                  DurationSelector(
-                    selectedDuration: timerState.selectedDuration == 0
-                        ? null
-                        : timerState.selectedDuration,
-                    onDurationSelected: (duration) {
-                      // Select duration and immediately start the timer
-                      timerController.selectDuration(duration);
-                      // Auto-start after a brief delay to allow state update
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        timerController.start();
-                      });
-                    },
-                  ),
-                
-                const SizedBox(height: 40),
-                
-                // Circular timer visualization
-                SizedBox(
-                  width: 240,
-                  height: 240,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Custom painted circular timer
-                      CustomPaint(
-                        size: const Size(240, 240),
-                        painter: CircularTimerPainter(
-                          progress: timerState.progress,
-                          backgroundColor: AppTheme.secondaryColor.withOpacity(0.3),
-                          progressColor: timerState.status == TimerStatus.completed
-                              ? AppTheme.accentColor
-                              : AppTheme.timerActive,
-                          strokeWidth: 16,
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      children: [
+                        // Header
+                        const SizedBox(height: 16),
+                        Text(
+                          'Tea Timer',
+                          style: Theme.of(context).textTheme.headlineLarge,
                         ),
-                      ),
-                      
-                      // Time display in center
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            timerState.formattedTime,
-                            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 56,
+                        const SizedBox(height: 4),
+                        Text(
+                          'Steep your tea to perfection',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).textTheme.bodySmall?.color,
+                              ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Duration selector (always visible)
+                        DurationSelector(
+                          selectedDuration: timerState.selectedDuration == 0
+                              ? null
+                              : timerState.selectedDuration,
+                          onDurationSelected: (duration) {
+                            // Select duration and immediately start the timer
+                            timerController.selectDuration(duration);
+                            // Auto-start after a brief delay to allow state update
+                            Future.delayed(const Duration(milliseconds: 100), () {
+                              timerController.start();
+                            });
+                          },
+                        ),
+                        
+                        // Spacer to push timer to center
+                        const Spacer(),
+                        
+                        // Circular timer visualization
+                        SizedBox(
+                          width: 240,
+                          height: 240,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Custom painted circular timer
+                              CustomPaint(
+                                size: const Size(240, 240),
+                                painter: CircularTimerPainter(
+                                  progress: timerState.progress,
+                                  backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                                  progressColor: timerState.status == TimerStatus.completed
+                                      ? Theme.of(context).colorScheme.tertiary
+                                      : Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                                  strokeWidth: 16,
                                 ),
-                          ),
-                          if (timerState.status != TimerStatus.idle)
-                            Text(
-                              _getStatusText(timerState.status),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppTheme.textSecondary,
-                                    fontSize: 14,
+                              ),
+                              
+                              // Time display in center
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    timerState.formattedTime,
+                                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 56,
+                                        ),
                                   ),
-                            ),
-                        ],
-                      ),
-                    ],
+                                  if (timerState.status != TimerStatus.idle)
+                                    Text(
+                                      _getStatusText(timerState.status),
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            fontSize: 14,
+                                          ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        // Spacer to push controls to bottom
+                        const Spacer(),
+                        
+                        // Control buttons at bottom
+                        _buildControlButtons(timerState, timerController),
+                        
+                        const SizedBox(height: 24),
+                      ],
+                    ),
                   ),
                 ),
-                
-                const SizedBox(height: 40),
-                
-                // Control buttons
-                _buildControlButtons(timerState, timerController),
-                
-                const SizedBox(height: 24),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -189,29 +200,33 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
             icon: Icons.refresh,
             label: 'Reset',
             onPressed: controller.reset,
+            isActive: true,
           ),
         ),
         
         const SizedBox(width: 16),
         
-        // Pause/Resume button (no play button when idle since timer auto-starts)
-        if (state.status == TimerStatus.running)
-          Expanded(
-            child: _ControlCard(
-              icon: Icons.pause,
-              label: 'Pause',
-              onPressed: controller.pause,
-            ),
+        // Pause button (active when running, inactive otherwise)
+        Expanded(
+          child: _ControlCard(
+            icon: Icons.pause,
+            label: 'Pause',
+            onPressed: state.status == TimerStatus.running ? controller.pause : null,
+            isActive: state.status == TimerStatus.running,
           ),
+        ),
         
-        if (state.status == TimerStatus.paused)
-          Expanded(
-            child: _ControlCard(
-              icon: Icons.play_arrow,
-              label: 'Resume',
-              onPressed: controller.resume,
-            ),
+        const SizedBox(width: 16),
+        
+        // Resume button (active when paused, inactive otherwise)
+        Expanded(
+          child: _ControlCard(
+            icon: Icons.play_arrow,
+            label: 'Resume',
+            onPressed: state.status == TimerStatus.paused ? controller.resume : null,
+            isActive: state.status == TimerStatus.paused,
           ),
+        ),
       ],
     );
   }
@@ -235,12 +250,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
 class _ControlCard extends StatefulWidget {
   final IconData icon;
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isActive;
   
   const _ControlCard({
     required this.icon,
     required this.label,
-    required this.onPressed,
+    this.onPressed,
+    this.isActive = true,
   });
   
   @override
@@ -272,12 +289,16 @@ class _ControlCardState extends State<_ControlCard>
   }
   
   void _handleTapDown(TapDownDetails details) {
-    _controller.forward();
+    if (widget.isActive && widget.onPressed != null) {
+      _controller.forward();
+    }
   }
   
   void _handleTapUp(TapUpDetails details) {
-    _controller.reverse();
-    widget.onPressed();
+    if (widget.isActive && widget.onPressed != null) {
+      _controller.reverse();
+      widget.onPressed!();
+    }
   }
   
   void _handleTapCancel() {
@@ -286,41 +307,42 @@ class _ControlCardState extends State<_ControlCard>
   
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                widget.icon,
-                color: AppTheme.primaryColor,
-                size: 32,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                widget.label,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppTheme.textPrimary,
-                    ),
-              ),
-            ],
+    return Opacity(
+      opacity: widget.isActive ? 1.0 : 0.3,
+      child: GestureDetector(
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  widget.icon,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 32,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.label,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
           ),
         ),
       ),

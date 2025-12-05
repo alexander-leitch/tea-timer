@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// App theme configuration with calm, aesthetic colors
 class AppTheme {
-  // Color palette - soft, calming tones
+  // Light mode color palette - soft, calming tones
   static const Color primaryColor = Color(0xFF8B9D83); // Soft sage green
   static const Color secondaryColor = Color(0xFFE8DCC4); // Warm beige
   static const Color accentColor = Color(0xFFC5B3D5); // Soft lavender
@@ -13,18 +13,71 @@ class AppTheme {
   static const Color textSecondary = Color(0xFF6B6B6B); // Gray
   static const Color timerActive = Color(0xFF7A8F72); // Darker sage
   
+  // Dark mode color palette - calm, muted dark tones
+  static const Color darkPrimaryColor = Color(0xFF9FB396); // Lighter sage for contrast
+  static const Color darkSecondaryColor = Color(0xFF6B5D4F); // Muted brown
+  static const Color darkAccentColor = Color(0xFFB5A0C8); // Muted lavender
+  static const Color darkBackgroundColor = Color(0xFF1A1A1A); // Deep charcoal
+  static const Color darkSurfaceColor = Color(0xFF2D2D2D); // Dark gray
+  static const Color darkTextPrimary = Color(0xFFE8E8E8); // Off-white text
+  static const Color darkTextSecondary = Color(0xFFB0B0B0); // Light gray
+  static const Color darkTimerActive = Color(0xFFA8BDA0); // Lighter sage for visibility
+  
   /// Creates the light theme for the app
   static ThemeData get lightTheme {
+    return _buildTheme(
+      brightness: Brightness.light,
+      primary: primaryColor,
+      secondary: secondaryColor,
+      accent: accentColor,
+      background: backgroundColor,
+      surface: surfaceColor,
+      textPrimary: textPrimary,
+      textSecondary: textSecondary,
+    );
+  }
+  
+  /// Creates the dark theme for the app
+  static ThemeData get darkTheme {
+    return _buildTheme(
+      brightness: Brightness.dark,
+      primary: darkPrimaryColor,
+      secondary: darkSecondaryColor,
+      accent: darkAccentColor,
+      background: darkBackgroundColor,
+      surface: darkSurfaceColor,
+      textPrimary: darkTextPrimary,
+      textSecondary: darkTextSecondary,
+    );
+  }
+  
+  /// Build theme with given colors
+  static ThemeData _buildTheme({
+    required Brightness brightness,
+    required Color primary,
+    required Color secondary,
+    required Color accent,
+    required Color background,
+    required Color surface,
+    required Color textPrimary,
+    required Color textSecondary,
+  }) {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.light(
-        primary: primaryColor,
-        secondary: secondaryColor,
-        surface: surfaceColor,
+      brightness: brightness,
+      colorScheme: ColorScheme(
+        brightness: brightness,
+        primary: primary,
+        secondary: secondary,
+        surface: surface,
         onSurface: textPrimary,
-        tertiary: accentColor,
+        tertiary: accent,
+        onPrimary: brightness == Brightness.light ? Colors.white : darkBackgroundColor,
+        onSecondary: brightness == Brightness.light ? textPrimary : darkTextPrimary,
+        error: brightness == Brightness.light ? const Color(0xFFD32F2F) : const Color(0xFFEF5350),
+        onError: Colors.white,
       ),
-      scaffoldBackgroundColor: backgroundColor,
+      scaffoldBackgroundColor: background,
       
       // Typography using Google Fonts
       textTheme: TextTheme(
@@ -108,18 +161,18 @@ class AppTheme {
       // Card theme
       cardTheme: CardTheme(
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withOpacity(brightness == Brightness.light ? 0.1 : 0.3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        color: surfaceColor,
+        color: surface,
       ),
       
       // Elevated button theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
+          backgroundColor: primary,
+          foregroundColor: brightness == Brightness.light ? Colors.white : darkBackgroundColor,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
@@ -134,8 +187,8 @@ class AppTheme {
       ),
       
       // Icon theme
-      iconTheme: const IconThemeData(
-        color: primaryColor,
+      iconTheme: IconThemeData(
+        color: primary,
         size: 24,
       ),
     );

@@ -101,13 +101,13 @@ class _DurationCardState extends State<_DurationCard>
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: widget.isSelected
-                ? AppTheme.primaryColor
-                : AppTheme.surfaceColor,
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: widget.isSelected
-                    ? AppTheme.primaryColor.withOpacity(0.3)
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
                     : Colors.black.withOpacity(0.05),
                 blurRadius: widget.isSelected ? 16 : 8,
                 offset: const Offset(0, 4),
@@ -122,8 +122,8 @@ class _DurationCardState extends State<_DurationCard>
                 widget.option.label,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: widget.isSelected
-                          ? Colors.white
-                          : AppTheme.textPrimary,
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).textTheme.titleLarge?.color,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -134,8 +134,8 @@ class _DurationCardState extends State<_DurationCard>
                 widget.option.subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: widget.isSelected
-                          ? Colors.white.withOpacity(0.9)
-                          : AppTheme.textSecondary,
+                          ? Theme.of(context).colorScheme.onPrimary.withOpacity(0.9)
+                          : Theme.of(context).textTheme.bodySmall?.color,
                     ),
               ),
             ],
