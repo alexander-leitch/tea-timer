@@ -257,6 +257,7 @@ class _ControlCardState extends State<_ControlCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
   
   @override
   void initState() {
@@ -279,35 +280,47 @@ class _ControlCardState extends State<_ControlCard>
   
   void _handleTapDown(TapDownDetails details) {
     if (widget.isActive && widget.onPressed != null) {
+      setState(() => _isPressed = true);
       _controller.forward();
     }
   }
   
   void _handleTapUp(TapUpDetails details) {
     if (widget.isActive && widget.onPressed != null) {
+      setState(() => _isPressed = false);
       _controller.reverse();
       widget.onPressed!();
     }
   }
   
   void _handleTapCancel() {
+    setState(() => _isPressed = false);
     _controller.reverse();
   }
   
   @override
   Widget build(BuildContext context) {
+    // Calculate effective opacity and color based on state
+    final double effectiveOpacity = widget.isActive ? 1.0 : 0.5;
+    // Use a darkened surface color for pressed state in light mode, or a lightened one in dark mode
+    final Color baseColor = Theme.of(context).colorScheme.surface;
+    final Color pressedColor = Theme.of(context).brightness == Brightness.light
+        ? Colors.grey.shade200
+        : Colors.white.withOpacity(0.1);
+        
     return Opacity(
-      opacity: widget.isActive ? 1.0 : 0.3,
+      opacity: effectiveOpacity,
       child: GestureDetector(
         onTapDown: _handleTapDown,
         onTapUp: _handleTapUp,
         onTapCancel: _handleTapCancel,
         child: ScaleTransition(
           scale: _scaleAnimation,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: _isPressed ? pressedColor : baseColor,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -322,13 +335,19 @@ class _ControlCardState extends State<_ControlCard>
               children: [
                 Icon(
                   widget.icon,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: widget.isActive 
+                      ? Theme.of(context).colorScheme.primary 
+                      : Theme.of(context).disabledColor,
                   size: 32,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   widget.label,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: widget.isActive 
+                        ? null 
+                        : Theme.of(context).disabledColor,
+                  ),
                 ),
               ],
             ),
