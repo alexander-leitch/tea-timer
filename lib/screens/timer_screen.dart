@@ -82,12 +82,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
             child: Column(
               children: [
                 // Header
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 Text(
                   'Tea Timer',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   'Steep your tea to perfection',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -95,7 +95,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                       ),
                 ),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
                 
                 // Duration selector (only show when idle)
                 if (timerState.status == TimerStatus.idle)
@@ -104,22 +104,27 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                         ? null
                         : timerState.selectedDuration,
                     onDurationSelected: (duration) {
+                      // Select duration and immediately start the timer
                       timerController.selectDuration(duration);
+                      // Auto-start after a brief delay to allow state update
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        timerController.start();
+                      });
                     },
                   ),
                 
-                const SizedBox(height: 60),
+                const SizedBox(height: 40),
                 
                 // Circular timer visualization
                 SizedBox(
-                  width: 280,
-                  height: 280,
+                  width: 240,
+                  height: 240,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       // Custom painted circular timer
                       CustomPaint(
-                        size: const Size(280, 280),
+                        size: const Size(240, 240),
                         painter: CircularTimerPainter(
                           progress: timerState.progress,
                           backgroundColor: AppTheme.secondaryColor.withOpacity(0.3),
@@ -138,7 +143,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                             timerState.formattedTime,
                             style: Theme.of(context).textTheme.displayLarge?.copyWith(
                                   fontWeight: FontWeight.w300,
-                                  fontSize: 64,
+                                  fontSize: 56,
                                 ),
                           ),
                           if (timerState.status != TimerStatus.idle)
@@ -155,12 +160,12 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 60),
+                const SizedBox(height: 40),
                 
                 // Control buttons
                 _buildControlButtons(timerState, timerController),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
               ],
             ),
           ),
