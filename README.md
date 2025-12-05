@@ -137,7 +137,29 @@ All code is thoroughly commented to explain:
 - Animation implementations
 - User interaction handling
 
-## 🤝 Contributing
+## � Development Metrics & AI Contribution
+
+This project was accelerated using **Google Antigravity**, an advanced agentic coding assistant designed to pair-program with human developers.
+
+### AI & Human Collaboration
+- **Primary Agent**: Google Antigravity
+- **Underlying Models**: Orchestrated workflow using **Claude 3.5 Sonnet (Thinking)**, **OpenAI GPT-OSS-120B**, and Google's experimental **M7/M8** models.
+- **Human Role**: Prompt engineering, high-level design direction, visual verification, and iteration feedback.
+- **Workflow**: The agent autonomously handled file creation, logic implementation, error debugging, and git management, while the user provided strategic oversight.
+
+### Efficiency Analysis
+Comparison of standard industry estimates (via `scc` COCOMO model) vs. actual development time:
+
+| Metric | Industry Estimate (SCC) | Actual (Antigravity) | Efficiency Gain |
+| :--- | :--- | :--- | :--- |
+| **Development Time** | 5.01 months | ~4 hours | **> 99%** |
+| **Estimated Cost** | $70,286 | N/A | **~$70k Saved** |
+| **Codebase Size** | ~3,500 lines | Generated in 1 session | N/A |
+| **Team Size** | 1.25 developers | 1 Human + 1 Agent | N/A |
+
+*Note: Calculations based on the Constructive Cost Model (COCOMO) for organic software development.*
+
+## �🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
